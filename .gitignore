@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# macOS
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Claude internal
+.agents/
+.openclaude/
+
+# Temporary build scripts
+build_*.py
+gen_*.py
+gen_*.svg
+gen_*.png
+/tmp/
+
+# Generated images (topology etc)
+waf_topo
+waf_topo.png
+waf_topo.svg
+.claude/settings.local.json
