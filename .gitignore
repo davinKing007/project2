@@ -26,3 +26,6 @@ waf_topo
 waf_topo.png
 waf_topo.svg
 .claude/settings.local.json
+
+# Node.js
+node_modules/
