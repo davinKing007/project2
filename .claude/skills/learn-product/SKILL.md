@@ -24,8 +24,9 @@ model: opus
 **第二步**：根据获取的信息和你的知识，按以下结构一次性输出全部模块。如某些信息无法获取，标注 `[需手动补充]`。
 - **模块 1-10**：必输出，售前主题框架
 - **模块 11（中立横向对比）**：可选模块，但**强烈建议输出**——它能帮你建立"客观专业"的形象，避免客户觉得你在"卖货"。
+- **模块 12（术语解释）**：必输出，解释全文出现的专业术语/英文缩写，配上大白话说明。
 
-**第三步**：输出完成后，自动将内容导出为 Word 文档，并告知用户文件路径。
+**第三步**：输出完成后，自动将内容导出为 Word 文档（统一字体为"苹方-简"，详见下方 Word 导出规范），并告知用户文件路径。
 
 ---
 
@@ -416,9 +417,101 @@ model: opus
 
 ---
 
+### 模块 12（必输出）：术语解释
+
+> **模块目的**：当客户（特别是非技术决策者）听到英文缩写或专业术语时，能随时用大白话解释，避免沟通断层。熟练掌握术语也是售前工程师专业性的基本体现。
+
+#### 执行方法
+
+输出完成后，扫描全文所有出现的专业术语和英文缩写，按以下分类组织：
+
+1. **芯片/架构类** — CPU 架构相关术语（ARM、x86、IPC、RISC-V、LoongArch、SVE、NUMA 等）
+2. **产品专有类** — 与该产品/厂商专属术语（如鲲鹏的 HCCS、SoC、灵衢互联、3D 堆叠、openEuler、openGauss 等）
+3. **基础设施/通用技术类** — 通用 IT 术语（TCO、POC、PCIe、RoCE、TDP、DDR、KVM、ODM 等）
+4. **生态/行业类** — 行业专属术语（信创、等保、PKS、DCU 等）
+5. **缩写速查表** — 按字母序汇总全部缩写
+
+#### 呈现模板
+
+建议使用 **四列表格**（术语 | 全称 | 技术解释 | 大白话），缩写速查表用三列表格（缩写 | 全称 | 中文）。
+
+**示例**：
+
+| 术语 | 全称 | 技术解释 | 大白话 |
+|------|------|---------|--------|
+| ARM | Advanced RISC Machine | 精简指令集处理器架构，低功耗设计 | 手机的省电架构，在服务器上用——干同样活电费省一半 |
+| SoC | System on Chip | 将 CPU、内存控制器、网卡等集成到单一芯片 | 原来 4 个盒子装的零件塞到 1 个盒子里——体积小、省电、故障少 |
+
+**缩写速查表示例**：
+
+| 缩写 | 全称 | 中文 |
+|------|------|------|
+| TCO | Total Cost of Ownership | 总拥有成本 |
+| POC | Proof of Concept | 概念验证 |
+
+> ⚠️ 术语应覆盖全文中实际出现的缩写和名词，宁多勿少。不限于以下类别，根据产品品类灵活扩充。
+
+---
+
 ## 品类适配参数
 
 参考 `@references/category-guide.md` 获取各品类的详细适配规则。
+
+## Word 导出规范
+
+生成 Word 文档时，必须遵循以下字体规范：
+
+### 统一字体设置
+
+全文（正文、标题、表格内容）统一使用 **"苹方-简"**（PingFang SC）字体，不使用其他字体。
+
+在 docx-js 中的配置方式：
+
+```javascript
+const doc = new Document({
+  styles: {
+    default: {
+      document: {
+        run: { font: "苹方-简", size: 22 }  // 11pt 正文
+      }
+    },
+    paragraphStyles: [
+      {
+        id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 32, bold: true, font: "苹方-简" },
+        paragraph: { spacing: { before: 240, after: 240 }, outlineLevel: 0 }
+      },
+      {
+        id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 28, bold: true, font: "苹方-简" },
+        paragraph: { spacing: { before: 180, after: 180 }, outlineLevel: 1 }
+      },
+      {
+        id: "Heading3", name: "Heading 3", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 24, bold: true, font: "苹方-简" },
+        paragraph: { spacing: { before: 120, after: 120 }, outlineLevel: 2 }
+      },
+    ]
+  },
+  // ...
+});
+```
+
+**关键规则**：
+- 所有 `TextRun` 默认继承 `default.document.run` 的字体，无需逐个设置
+- 标题样式（Heading1/2/3）显式指定 `font: "苹方-简"`
+- 表格内文本也自动继承默认字体，无需额外设置
+- 代码块/等宽字体的内容也统一使用苹方-简（售前文档面向客户，不需要等宽代码字体）
+
+### 文档元数据
+
+文档正文语言设为中文：
+
+```javascript
+new ExternalHyperlink({ ... })  // 保持默认即可，无需特殊设置
+// 或在 sections[].properties 中无需额外设置语言
+```
+
 
 ## 信息来源标注
 
